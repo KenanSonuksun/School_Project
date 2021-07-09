@@ -25,7 +25,7 @@ class FirebaseService extends ChangeNotifier {
     return retVal;
   }
 
-  //A funtion to sign out
+  //A function to sign out
   Future<String> signOut() async {
     String retVal = "loggedIn";
     try {
@@ -39,7 +39,7 @@ class FirebaseService extends ChangeNotifier {
     return retVal;
   }
 
-  //A funtion to sign up
+  //A function to sign up
   Future<bool> signUp(String email, String password) async {
     bool retVal = false;
     try {
@@ -47,16 +47,17 @@ class FirebaseService extends ChangeNotifier {
           email: email.trim(), password: password.trim());
 
       if (_authResult.user != null) {
+        await _authResult.user.sendEmailVerification();
         retVal = true;
       }
     } catch (e) {
       print(e);
     }
 
-    return retVal;
+    return true;
   }
 
-  //A funtion to log in
+  //A function to log in
   Future<bool> logIn(String email, String password) async {
     bool retVal = false;
     try {
@@ -64,14 +65,18 @@ class FirebaseService extends ChangeNotifier {
           email: email.trim(), password: password.trim());
 
       if (_authResult.user != null) {
-        _uid = _authResult.user.uid;
-        _email = _authResult.user.email;
-        retVal = true;
+        if (_authResult.user.emailVerified) {
+          _uid = _authResult.user.uid;
+          _email = _authResult.user.email;
+          retVal = true;
+        } else {
+          print("verifying is wrong");
+        }
       }
     } catch (e) {
       print(e);
     }
 
-    return retVal;
+    return true;
   }
 }

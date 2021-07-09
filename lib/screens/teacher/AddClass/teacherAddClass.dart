@@ -1,15 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:schoolproject/components/consts.dart';
+import 'package:schoolproject/components/appbar.dart';
 import 'package:schoolproject/components/customButton.dart';
 import 'package:schoolproject/components/customDialogs.dart';
-import 'package:schoolproject/components/customText.dart';
 import 'package:schoolproject/components/customTextField.dart';
 import 'package:schoolproject/screens/teacher/HomePage/teacherHomePage.dart';
 import 'package:intl/intl.dart';
 
 class TeacherAddClass extends StatefulWidget {
+  final data;
+
+  const TeacherAddClass({Key key, this.data}) : super(key: key);
+
   @override
   _TeacherAddClassState createState() => _TeacherAddClassState();
 }
@@ -20,21 +23,14 @@ class _TeacherAddClassState extends State<TeacherAddClass> {
   TextEditingController _classCode = TextEditingController();
   TextEditingController _totalStudent = TextEditingController();
   FirebaseAuth _auth = FirebaseAuth.instance;
-
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
       //Appbar
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
-        backgroundColor: primaryColor,
-        centerTitle: true,
-        title: CustomText(
-          color: Colors.white,
-          sizes: TextSize.normal,
-          text: "Sınıf Ekle",
-        ),
+      appBar: CustomAppBar(
+        text: "Sınıf Ekle",
+        widget: SizedBox(),
       ),
       //Body
       body: SingleChildScrollView(
@@ -71,7 +67,6 @@ class _TeacherAddClassState extends State<TeacherAddClass> {
                   readonly: false,
                   keyboardType: TextInputType.text,
                   obscureText: false,
-                  onChanged: (String value) {},
                 ),
               ),
               Padding(
@@ -100,11 +95,12 @@ class _TeacherAddClassState extends State<TeacherAddClass> {
                   onChanged: (String value) {},
                 ),
               ),
-              //Button
+              //A button to add
               Padding(
                 padding: const EdgeInsets.only(top: 15.0),
                 child: CustomButton(
                   onpressed: () {
+                    int done = 0;
                     //Check text fields to continue
                     if (_classNumber.text.length > 1 ||
                         _classNumber.text.isEmpty) {
@@ -134,41 +130,64 @@ class _TeacherAddClassState extends State<TeacherAddClass> {
                           Icons.close,
                           Colors.black);
                     }
-                    //if all text fields are correct,
+                    //check class code and finish
                     else {
-                      //progress in firebase
-                      DateTime now = DateTime.now();
-                      String formattedDate =
-                          DateFormat('yyyy-MM-dd – kk:mm').format(now);
-                      User firebaseUser = _auth.currentUser;
-                      String _uid = firebaseUser.uid;
-                      String _email = firebaseUser.email;
-                      FirebaseFirestore.instance.collection(_email).doc().set({
-                        "sınıfKodu": _classCode.text,
-                        "mevcut": _totalStudent.text,
-                        "sınıf": "${_classNumber.text}-${_className.text}",
-                        "uId": _uid,
-                        "email": _email,
-                        "date": formattedDate,
-                        "students": [],
-                        "duyurular": [],
-                        "lessonPlan": []
-                      });
-                      //dialog
-                      CustomDialog().firstDialog(context, "Kayıt başarılı",
-                          Icons.done_outline, Colors.green);
-                      //push Home Page after 2 seconds
-                      Future.delayed(const Duration(milliseconds: 2000), () {
-                        Navigator.pop(context);
-                        _classNumber.clear();
-                        _className.clear();
-                        _classCode.clear();
-                        _totalStudent.clear();
-                        Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (context) => TeacherHomePage()),
-                            (Route<dynamic> route) => false);
-                      });
+                      //check that any class has this class code or not
+                      for (int i = 0; i < widget.data.length; i++) {
+                        if (_classCode.text ==
+                            widget.data[i]["classCode"].toString()) {
+                          done++;
+                        }
+                      }
+                      //if all things are correct
+                      if (done == 0) {
+                        //progress in firebase
+                        DateTime now = DateTime.now();
+                        String formattedDate =
+                            DateFormat('yyyy-MM-dd – kk:mm').format(now);
+                        User firebaseUser = _auth.currentUser;
+                        String _uid = firebaseUser.uid;
+                        String _email = firebaseUser.email;
+                        FirebaseFirestore.instance
+                            .collection(_email)
+                            .doc()
+                            .set({
+                          "classCode": _classCode.text,
+                          "totalStudent": _totalStudent.text,
+                          "class":
+                              "${_classNumber.text}-${_className.text.toUpperCase()}",
+                          "uId": _uid,
+                          "email": _email,
+                          "date": formattedDate,
+                          "students": [],
+                          "announcements": [],
+                          "lessonPlan": [],
+                          "homeworks": [],
+                        });
+                        //dialog
+                        CustomDialog().firstDialog(context, "Kayıt başarılı",
+                            Icons.done_outline, Colors.green);
+                        //push Home Page after 2 seconds
+                        Future.delayed(const Duration(milliseconds: 2000), () {
+                          Navigator.pop(context);
+                          _classNumber.clear();
+                          _className.clear();
+                          _classCode.clear();
+                          _totalStudent.clear();
+                          Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (context) => TeacherHomePage()),
+                              (Route<dynamic> route) => false);
+                        });
+                      }
+                      //if this class code has been used
+                      else {
+                        CustomDialog().firstDialog(
+                            context,
+                            "Farklı bir sınıf kodu giriniz",
+                            Icons.close,
+                            Colors.red);
+                      }
                     }
                   },
                   text: "Ekle",

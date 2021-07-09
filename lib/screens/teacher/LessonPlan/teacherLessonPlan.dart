@@ -1,139 +1,107 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:schoolproject/components/animation.dart';
+import 'package:schoolproject/components/appbar.dart';
 import 'package:schoolproject/components/consts.dart';
-import 'package:schoolproject/components/customText.dart';
 import 'package:schoolproject/components/lessonTimeline.dart';
-import 'package:schoolproject/providers/classesProvider.dart';
+import 'package:schoolproject/components/noData.dart';
 import 'package:schoolproject/screens/teacher/LessonPlan/teacherAddLesson.dart';
-import 'package:schoolproject/screens/teacher/HomePage/teacherHomePage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class TeacherLessonPlan extends StatefulWidget {
   final int index;
+  final classes;
 
-  const TeacherLessonPlan({Key key, this.index}) : super(key: key);
+  const TeacherLessonPlan({Key key, this.index, this.classes})
+      : super(key: key);
   @override
   _TeacherLessonPlanState createState() => _TeacherLessonPlanState();
 }
 
-class _TeacherLessonPlanState extends State<TeacherLessonPlan> {
-  ClassesProvider classesProvider;
-  String email;
+class _TeacherLessonPlanState extends State<TeacherLessonPlan>
+    with SingleTickerProviderStateMixin {
   List mon = [], tues = [], wed = [], thur = [], fri = [];
-
-  //Get data from firebase
-  getData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      email = prefs.getString("email");
-    });
-    classesProvider = Provider.of<ClassesProvider>(context, listen: false);
-    classesProvider.getData(email);
-    for (int i = 0;
-        i < classesProvider.classes[widget.index]["Wednesday"].length;
-        i++) {
-      setState(() {
-        wed.add(classesProvider.classes[widget.index]["Wednesday"][i]);
-      });
-    }
-    for (int i = 0;
-        i < classesProvider.classes[widget.index]["Monday"].length;
-        i++) {
-      setState(() {
-        mon.add(classesProvider.classes[widget.index]["Monday"][i]);
-      });
-    }
-    for (int i = 0;
-        i < classesProvider.classes[widget.index]["Tuesday"].length;
-        i++) {
-      setState(() {
-        tues.add(classesProvider.classes[widget.index]["Tuesday"][i]);
-      });
-    }
-    for (int i = 0;
-        i < classesProvider.classes[widget.index]["Thursday"].length;
-        i++) {
-      setState(() {
-        thur.add(classesProvider.classes[widget.index]["Thursday"][i]);
-      });
-    }
-    for (int i = 0;
-        i < classesProvider.classes[widget.index]["Friday"].length;
-        i++) {
-      setState(() {
-        fri.add(classesProvider.classes[widget.index]["Friday"][i]);
-      });
-    }
-  }
-
-  //Loading screen before screen
-  bool isLoading = true;
-  void startTimer() {
-    Timer.periodic(const Duration(seconds: 2), (t) {
-      setState(() {
-        isLoading = false; //set loading to false
-      });
-      t.cancel(); //stops the timer
-    });
-  }
+  AnimationController animationController;
 
   @override
   void initState() {
-    getData();
-    startTimer();
+    for (int i = 0; i < widget.classes["lessonPlan"].length; i++) {
+      if (widget.classes["lessonPlan"][i]["dateName"] == "Monday") {
+        setState(() {
+          mon.add(widget.classes["lessonPlan"][i]);
+        });
+      } else if (widget.classes["lessonPlan"][i]["dateName"] == "Wednesday") {
+        setState(() {
+          wed.add(widget.classes["lessonPlan"][i]);
+        });
+      } else if (widget.classes["lessonPlan"][i]["dateName"] == "Tuesday") {
+        setState(() {
+          tues.add(widget.classes["lessonPlan"][i]);
+        });
+      } else if (widget.classes["lessonPlan"][i]["dateName"] == "Thursday") {
+        setState(() {
+          thur.add(widget.classes["lessonPlan"][i]);
+        });
+      } else if (widget.classes["lessonPlan"][i]["dateName"] == "Friday") {
+        setState(() {
+          fri.add(widget.classes["lessonPlan"][i]);
+        });
+      }
+    }
+    animationController =
+        AnimationController(vsync: this, duration: Duration(seconds: 2));
     super.initState();
   }
 
   @override
+  void dispose() {
+    animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final className = Provider.of<ClassesProvider>(context);
-    Size size = MediaQuery.of(context).size;
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
       //Appbar
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
-        backgroundColor: primaryColor,
-        backwardsCompatibility: false,
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => TeacherHomePage()),
-                  (Route<dynamic> route) => false);
-            }),
-        centerTitle: true,
-        title: CustomText(
-          color: Colors.white,
-          sizes: TextSize.normal,
-          text: "Ders Programı",
-        ),
+      appBar: CustomAppBar(
+        text: "Ders Programı",
+        widget: SizedBox(),
       ),
       //Body
-      body: isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
+      body: widget.classes["lessonPlan"].length == 0
+          ? NoData(
+              text:
+                  "Seçtiğiniz sınıfa ait herhangi bir ders programı kaydı bulunmamaktadır.",
             )
           : SingleChildScrollView(
               child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 //widgets
-                LessonTimeLine(
-                  dizi: mon,
+                ListView.builder(
+                  physics: NeverScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  itemCount: 5,
+                  itemBuilder: (context, index) {
+                    return SlideAnimation(
+                      animationController: animationController,
+                      itemCount: 5,
+                      position: index,
+                      slideDirection: SlideDirection.fromBottom,
+                      child: LessonTimeLine(
+                        array: index == 0
+                            ? mon
+                            : index == 1
+                                ? tues
+                                : index == 2
+                                    ? wed
+                                    : index == 3
+                                        ? thur
+                                        : fri,
+                      ),
+                    );
+                  },
                 ),
-                LessonTimeLine(
-                  dizi: tues,
-                ),
-                LessonTimeLine(
-                  dizi: wed,
-                ),
-                LessonTimeLine(
-                  dizi: thur,
-                ),
-                LessonTimeLine(
-                  dizi: fri,
-                ),
+
                 SizedBox(
                   height: size.height * 0.05,
                 )
@@ -157,7 +125,8 @@ class _TeacherLessonPlanState extends State<TeacherLessonPlan> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => TeacherAddLesson(
-                        classInfo: className.classes, index: widget.index)));
+                        classInformation: widget.classes,
+                        index: widget.index)));
           },
         ),
       ),

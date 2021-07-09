@@ -27,6 +27,34 @@ class CustomDialog {
             ));
   }
 
+  //for sentences whic is long
+  void bigDialog(context, text, onPressed, color) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => CupertinoAlertDialog(
+              title: Text(
+                text,
+                style: TextStyle(
+                    color: color,
+                    fontSize:
+                        MediaQuery.of(context).size.width > 500 ? 25 : 20),
+              ),
+              actions: <Widget>[
+                CupertinoDialogAction(
+                  isDefaultAction: true,
+                  child: Text(
+                    "Tamam",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize:
+                            MediaQuery.of(context).size.width > 500 ? 25 : 17),
+                  ),
+                  onPressed: onPressed,
+                ),
+              ],
+            ));
+  }
+
   //user choose yes or no with this dialog
   void secondDialog(context, text, onPressedYes, onPressedNo) {
     showDialog(

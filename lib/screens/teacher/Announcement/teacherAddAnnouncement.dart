@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:schoolproject/components/consts.dart';
-import 'package:schoolproject/components/customText.dart';
+import 'package:schoolproject/Components/findClassName.dart';
+import 'package:schoolproject/components/appbar.dart';
 import 'package:schoolproject/components/dropDown.dart';
 
 class TeacherAddAnnouncment extends StatefulWidget {
@@ -17,28 +17,25 @@ class _TeacherAddAnnouncmentState extends State<TeacherAddAnnouncment> {
   @override
   void initState() {
     //Create an array which array has class name
-    for (int i = 0; i < widget.classes.length; i++) {
-      setState(() {
-        values.add(widget.classes[i]["sınıf"].toString());
-      });
+    if (widget.classes != null) {
+      for (int i = 0; i < widget.classes.classes.length; i++) {
+        setState(() {
+          values.add(widget.classes.classes[i]["class"].toString());
+        });
+      }
     }
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
       //Appbar
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
-        backgroundColor: primaryColor,
-        centerTitle: true,
-        title: CustomText(
-          color: Colors.white,
-          sizes: TextSize.normal,
-          text: "Duyurular",
-        ),
+      appBar: CustomAppBar(
+        text: "Duyuru Ekle",
+        widget: SizedBox(),
       ),
       //Body
       body: SingleChildScrollView(
@@ -67,11 +64,6 @@ class _TeacherAddAnnouncmentState extends State<TeacherAddAnnouncment> {
                     borderSide: BorderSide(color: Colors.grey[700]),
                     gapPadding: 10,
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(color: Colors.grey[700]),
-                    gapPadding: 10,
-                  ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide(color: Colors.grey[700]),
@@ -81,7 +73,6 @@ class _TeacherAddAnnouncmentState extends State<TeacherAddAnnouncment> {
                   hintStyle: TextStyle(color: Colors.grey),
                   labelStyle: TextStyle(color: Colors.grey),
                   helperStyle: TextStyle(color: Colors.black),
-                  floatingLabelBehavior: FloatingLabelBehavior.always,
                 ),
               ),
             ),

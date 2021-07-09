@@ -3,10 +3,17 @@ import 'package:flutter/material.dart';
 
 class ClassesProvider with ChangeNotifier {
   var classes;
-  var docId;
+  bool loading = true;
+  bool error = false;
   getData(email) async {
     await FirebaseFirestore.instance.collection(email).get().then((value) {
-      classes = value.docs;
+      if (value != null) {
+        classes = value.docs;
+        loading = false;
+      } else {
+        loading = false;
+        error = true;
+      }
     });
     notifyListeners();
   }

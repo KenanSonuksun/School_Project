@@ -5,7 +5,8 @@ import 'package:schoolproject/providers/classesProvider.dart';
 import 'package:schoolproject/providers/profileProvider.dart';
 import 'package:schoolproject/providers/validationLogin.dart';
 import 'package:schoolproject/providers/validationSignup.dart';
-import 'package:schoolproject/screens/splashPage.dart';
+import 'package:schoolproject/screens/SplashScreen/splashPage.dart';
+import 'package:schoolproject/screens/student/HomePage/studentHomePage.dart';
 import 'package:schoolproject/screens/teacher/HomePage/teacherHomePage.dart';
 import 'package:schoolproject/service/service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +17,7 @@ Future<void> main() async {
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
   var email = prefs.getString('email');
+  var studentEmail = prefs.getString("studentEmail");
 
   runApp(MultiProvider(
     providers: [
@@ -36,7 +38,13 @@ Future<void> main() async {
         fontFamily: "Muli",
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: email != null ? TeacherHomePage() : SplashPage(),
+      home: email != null
+          ? TeacherHomePage()
+          : studentEmail != null
+              ? StudentHomePage()
+              : SplashPage(),
     ),
   ));
 }
+//Doğrulama kodu için returnleri düzelt
+//Firebase bilgilerini gizle

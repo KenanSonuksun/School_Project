@@ -1,19 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:schoolproject/components/appbar.dart';
 import 'package:schoolproject/components/consts.dart';
 import 'package:schoolproject/components/customButton.dart';
 import 'package:schoolproject/components/customDialogs.dart';
 import 'package:schoolproject/components/customText.dart';
 import 'package:schoolproject/components/customTextField.dart';
-import 'package:schoolproject/screens/teacher/LessonPlan/teacherLessonPlan.dart';
+import 'package:schoolproject/screens/teacher/HomePage/teacherHomePage.dart';
 import 'package:intl/intl.dart';
 
 class TeacherAddLesson extends StatefulWidget {
   final int index;
-  final classInfo;
+  final classInformation;
 
-  const TeacherAddLesson({Key key, this.classInfo, this.index})
+  const TeacherAddLesson({Key key, this.classInformation, this.index})
       : super(key: key);
   @override
   _TeacherAddLessonState createState() => _TeacherAddLessonState();
@@ -26,18 +27,12 @@ class _TeacherAddLessonState extends State<TeacherAddLesson> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
       //Appbar
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.white),
-        backgroundColor: primaryColor,
-        centerTitle: true,
-        title: CustomText(
-          color: Colors.white,
-          sizes: TextSize.normal,
-          text: "Ders Programı Ekle",
-        ),
+      appBar: CustomAppBar(
+        text: "Ders Programı Ekle",
+        widget: SizedBox(),
       ),
       //Body
       body: SingleChildScrollView(
@@ -99,12 +94,10 @@ class _TeacherAddLessonState extends State<TeacherAddLesson> {
                   if (_lessonName.text.isNotEmpty && didChoose) {
                     //progress in firebase
                     await FirebaseFirestore.instance
-                        .collection(
-                            widget.classInfo[widget.index]["email"].toString())
-                        .doc(widget.classInfo[widget.index].id.toString())
+                        .collection(widget.classInformation["email"].toString())
+                        .doc(widget.classInformation.id.toString())
                         .update({
-                      "${(DateFormat('EEEE').format(date).toString())}":
-                          FieldValue.arrayUnion([
+                      "lessonPlan": FieldValue.arrayUnion([
                         {
                           "lesson": _lessonName.text,
                           "date": date.toString().substring(0, 16),
@@ -122,9 +115,7 @@ class _TeacherAddLessonState extends State<TeacherAddLesson> {
                     Future.delayed(Duration(seconds: 2), () {
                       Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                              builder: (context) => TeacherLessonPlan(
-                                    index: widget.index,
-                                  )),
+                              builder: (context) => TeacherHomePage()),
                           (Route<dynamic> route) => false);
                     });
                   } else {

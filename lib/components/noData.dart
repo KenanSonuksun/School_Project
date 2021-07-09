@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 class NoData extends StatelessWidget {
+  final String text;
+
+  const NoData({Key key, this.text}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -19,7 +22,7 @@ class NoData extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
           child: Text(
-            "Kayıtlı sınıf bulunmamaktadır.Lütfen internet bağlantınızı kontrol edip tekrar deneyiniz.",
+            text,
             textAlign: TextAlign.center,
             style: TextStyle(
                 fontSize: size.width > 500

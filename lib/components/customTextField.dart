@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
+  final String keyName;
   final double topPadding;
   final Widget suffixIcon;
   final bool readonly;
@@ -27,7 +28,8 @@ class CustomTextField extends StatelessWidget {
       this.keyboardType,
       this.labelText,
       this.height,
-      this.onChanged})
+      this.onChanged,
+      this.keyName})
       : super(key: key);
 
   @override

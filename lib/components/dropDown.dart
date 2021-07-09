@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:schoolproject/Components/findClassName.dart';
 import 'package:schoolproject/components/customDialogs.dart';
-import 'package:schoolproject/screens/teacher/Announcement/teacherAnnouncement.dart';
+import 'package:schoolproject/screens/teacher/HomePage/teacherHomePage.dart';
 import 'consts.dart';
 import 'customButton.dart';
 import 'customText.dart';
@@ -40,17 +41,19 @@ class DropDownMenu extends StatelessWidget {
                 ),
                 //dropdown menu
                 trailing: DropdownButton<String>(
-                  value: dropdownValue,
+                  value: FindClassName().className,
                   icon: Icon(Icons.arrow_downward),
                   iconSize: size.width > 428 ? 35 : 24,
                   elevation: size.width > 428 ? 25 : 16,
                   style: TextStyle(color: Colors.black),
                   underline: Container(height: 2, color: secondaryColor),
                   onChanged: (String newValue) {
-                    dropdownValue = newValue;
-                    for (int i = 0; i < classes.length; i++) {
-                      if (classes[i]["sınıf"] == dropdownValue) {
+                    for (int i = 0; i < classes.classes.length; i++) {
+                      if (classes.classes[i]["class"] == dropdownValue) {
                         innerSetState(() {
+                          dropdownValue = newValue;
+                          FindClassName().setClassName(newValue);
+                          FindClassName().setIndex(i);
                           index = i;
                         });
                       }
@@ -79,13 +82,13 @@ class DropDownMenu extends StatelessWidget {
             onpressed: () async {
               //progress in firebase
               await FirebaseFirestore.instance
-                  .collection(classes[index]["email"].toString())
-                  .doc(classes[index].id.toString())
+                  .collection(classes.classes[index]["email"].toString())
+                  .doc(classes.classes[FindClassName().index].id.toString())
                   .update({
-                "duyurular": FieldValue.arrayUnion([
+                "announcements": FieldValue.arrayUnion([
                   {
-                    "duyuru": anouncementController,
-                    "tarih": formattedDate,
+                    "announcement": anouncementController,
+                    "date": formattedDate,
                   }
                 ])
               });
@@ -94,10 +97,8 @@ class DropDownMenu extends StatelessWidget {
                   Icons.done_outline, Colors.green);
               //push Home Page after 2 seconds
               Future.delayed(Duration(seconds: 2), () {
-                Navigator.pop(context);
                 Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                        builder: (context) => TeacherAnnouncment()),
+                    MaterialPageRoute(builder: (context) => TeacherHomePage()),
                     (Route<dynamic> route) => false);
               });
             },

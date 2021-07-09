@@ -31,10 +31,10 @@ class CustomText extends StatelessWidget {
                 fontSize: size.width < 390
                     ? 14
                     : size.width > 500
-                        ? 25
-                        : 20)
+                        ? 22
+                        : 17)
             : sizes == TextSize.title
-                //TextSize is tittle
+                //TextSize is title
                 ? TextStyle(
                     color: color,
                     fontWeight: FontWeight.bold,
@@ -42,8 +42,8 @@ class CustomText extends StatelessWidget {
                     fontSize: size.width < 390
                         ? 16
                         : size.width > 500
-                            ? 27
-                            : 25)
+                            ? 24
+                            : 18)
                 : sizes == TextSize.small
                     //TextSize is small
                     ? TextStyle(
@@ -53,14 +53,14 @@ class CustomText extends StatelessWidget {
                             ? 12
                             : size.width > 500
                                 ? 20
-                                : 17)
+                                : 14)
                     : TextStyle(
                         color: color,
                         fontFamily: 'Muli',
                         fontSize: size.width < 390
                             ? 18
                             : size.width > 500
-                                ? 26
-                                : 22));
+                                ? 24
+                                : 18));
   }
 }

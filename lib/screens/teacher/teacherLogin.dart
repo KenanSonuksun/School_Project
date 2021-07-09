@@ -5,7 +5,6 @@ import 'package:schoolproject/components/customButton.dart';
 import 'package:schoolproject/components/customDialogs.dart';
 import 'package:schoolproject/components/customText.dart';
 import 'package:schoolproject/components/customTextField.dart';
-import 'package:schoolproject/providers/validationLogin.dart';
 import 'package:schoolproject/screens/teacher/HomePage/teacherHomePage.dart';
 import 'package:schoolproject/screens/teacher/teacherSignup.dart';
 import 'package:schoolproject/service/service.dart';
@@ -22,7 +21,6 @@ class _TeacherLoginState extends State<TeacherLogin>
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   String repsw = "";
-
   Animation fadeAnim;
   AnimationController animationController;
 
@@ -37,8 +35,11 @@ class _TeacherLoginState extends State<TeacherLogin>
         Navigator.push(context,
             MaterialPageRoute(builder: (context) => TeacherHomePage()));
       } else {
-        CustomDialog()
-            .firstDialog(context, "Giriş başarısız", Icons.close, Colors.red);
+        CustomDialog().bigDialog(context,
+            "Giriş başarısız. Emailinizi,şifrenizi kontrol edin ve email doğrulaması yaptığınızdan emin olun",
+            () {
+          Navigator.pop(context);
+        }, Colors.red);
       }
     } catch (e) {
       print(e);
@@ -46,7 +47,7 @@ class _TeacherLoginState extends State<TeacherLogin>
   }
 
   //Get email with SharedPreferences
-  getEmail() async {
+  void getEmail() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString("email", emailController.text);
   }
@@ -78,8 +79,7 @@ class _TeacherLoginState extends State<TeacherLogin>
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    final validationProvider = Provider.of<LoginValidation>(context);
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
       //Appbar
       appBar: PreferredSize(
@@ -108,9 +108,13 @@ class _TeacherLoginState extends State<TeacherLogin>
                   child: Column(
                     children: [
                       //Image
-                      Image.asset("assets/images/login.jpg"),
+                      Image.asset(
+                        "assets/images/login.jpg",
+                        height: 300,
+                      ),
                       //Text field for email
                       CustomTextField(
+                          key: Key("loginEmail"),
                           topPadding: size.height * 0.02,
                           controller: emailController,
                           hintText: "Email",
@@ -118,25 +122,10 @@ class _TeacherLoginState extends State<TeacherLogin>
                           readonly: false,
                           keyboardType: TextInputType.text,
                           obscureText: false,
-                          onChanged: (String value) {
-                            validationProvider.changeEmail(value);
-                          }),
-                      //for validation warning
-                      validationProvider.email.error != null
-                          ? Padding(
-                              padding: const EdgeInsets.only(top: 3.0),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  validationProvider.email.error ?? "",
-                                  style: TextStyle(
-                                      color: CupertinoColors.systemRed),
-                                ),
-                              ),
-                            )
-                          : SizedBox(),
+                          onChanged: (String value) {}),
                       //Text field for password
                       CustomTextField(
+                          key: Key("loginPass"),
                           topPadding: size.height * 0.01,
                           controller: passwordController,
                           hintText: "Şifre",
@@ -144,32 +133,16 @@ class _TeacherLoginState extends State<TeacherLogin>
                           readonly: false,
                           keyboardType: TextInputType.text,
                           obscureText: true,
-                          onChanged: (String value) {
-                            validationProvider.changePassword(value);
-                          }),
-                      //for validation warning
-                      validationProvider.password.error != null
-                          ? Padding(
-                              padding: const EdgeInsets.only(top: 3.0),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  validationProvider.password.error ?? "",
-                                  style: TextStyle(
-                                      color: CupertinoColors.systemRed),
-                                ),
-                              ),
-                            )
-                          : SizedBox(),
+                          onChanged: (String value) {}),
                       SizedBox(
                         height: size.height * 0.02,
                       ),
                       //A button to sign in
                       CustomButton(
+                        key: Key("loginButton"),
                         text: "Giriş Yap",
                         onpressed: () async {
-                          if (validationProvider.isValid &&
-                              emailController.text.isNotEmpty &&
+                          if (emailController.text.isNotEmpty &&
                               passwordController.text.isNotEmpty) {
                             _signInUser(emailController.text,
                                 passwordController.text, context);

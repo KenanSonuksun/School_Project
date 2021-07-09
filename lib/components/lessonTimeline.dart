@@ -37,7 +37,7 @@ class LessonTimeLine extends StatelessWidget {
                     Container(
                       margin: EdgeInsets.only(left: 20),
                       width: size.width * 0.85,
-                      height: (array.length) * size.height * 0.1,
+                      height: (array.length) * size.height * 0.11,
                       color: Colors.white,
                       child: ListView.builder(
                         physics: NeverScrollableScrollPhysics(),

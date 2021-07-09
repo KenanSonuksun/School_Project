@@ -19,6 +19,7 @@ class _TeacherSignupState extends State<TeacherSignup>
   final _formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final nameController = TextEditingController();
+  final phoneController = TextEditingController();
   final passwordController = TextEditingController();
   final rePasswordController = TextEditingController();
   String repsw = "";
@@ -34,14 +35,21 @@ class _TeacherSignupState extends State<TeacherSignup>
 
     try {
       if (await _currentUser.signUp(email, password)) {
-        CustomDialog().firstDialog(
-            context, "Kayıt başarılı", Icons.done_outline, Colors.green);
+        //if everything is done user have to verify email to sign in
 
-        Future.delayed(const Duration(milliseconds: 1000), () {
+        //and this dialog is information about that
+        CustomDialog().bigDialog(context,
+            "Maililnize gönderilen doğrulamayı yaptıktan sonra giriş yapabilirisinz",
+            () {
+          Navigator.pop(context);
+        }, Colors.green);
+        //after 5 seconds go previous page
+        Future.delayed(const Duration(milliseconds: 5000), () {
           Navigator.pop(context);
           Navigator.pop(context);
         });
       } else {
+        //sigin up is failed
         CustomDialog()
             .firstDialog(context, "Kayıt başarısız", Icons.close, Colors.red);
       }
@@ -73,13 +81,14 @@ class _TeacherSignupState extends State<TeacherSignup>
     passwordController.dispose();
     rePasswordController.dispose();
     animationController.dispose();
+    phoneController.dispose();
 
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    final Size size = MediaQuery.of(context).size;
     final validationProvider = Provider.of<SignupValidation>(context);
     return Scaffold(
       //Appbar
@@ -162,6 +171,18 @@ class _TeacherSignupState extends State<TeacherSignup>
                               ),
                             )
                           : SizedBox(),
+                      //Text field for phone number
+                      CustomTextField(
+                          topPadding: size.height * 0.01,
+                          controller: phoneController,
+                          hintText: "Telefon Numarası",
+                          suffixIcon: Icon(CupertinoIcons.person),
+                          readonly: false,
+                          keyboardType: TextInputType.text,
+                          obscureText: false,
+                          onChanged: (String value) {
+                            validationProvider.changeFullName(value);
+                          }),
                       //Text field for password
                       CustomTextField(
                           topPadding: size.height * 0.01,
@@ -231,14 +252,17 @@ class _TeacherSignupState extends State<TeacherSignup>
                               nameController.text.isNotEmpty &&
                               passwordController.text.isNotEmpty &&
                               rePasswordController.text.isNotEmpty) {
+                            //progress in firebase
                             FirebaseFirestore.instance
                                 .collection("users")
                                 .doc(emailController.text)
                                 .set({
                               "fullName": nameController.text,
                               "email": emailController.text,
-                              "password": passwordController.text
+                              "password": passwordController.text,
+                              "phoneNumber": phoneController.text
                             });
+                            //signup service
                             _signUpUser(emailController.text,
                                 passwordController.text, context);
                           } else {

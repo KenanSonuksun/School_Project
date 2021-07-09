@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:schoolproject/components/consts.dart';
+import 'package:schoolproject/components/appbar.dart';
 import 'package:schoolproject/components/customButton.dart';
 import 'package:schoolproject/components/customDialogs.dart';
-import 'package:schoolproject/components/customText.dart';
 import 'package:schoolproject/components/customTextField.dart';
 import 'package:schoolproject/screens/teacher/HomePage/teacherHomePage.dart';
 
@@ -25,32 +24,26 @@ class TeacherEditClass extends StatefulWidget {
 
 class _TeacherEditClassState extends State<TeacherEditClass> {
   TextEditingController _class = TextEditingController();
-  TextEditingController mevcut = TextEditingController();
-  TextEditingController sinifKodu = TextEditingController();
+  TextEditingController _totalStudent = TextEditingController();
+  TextEditingController _classCode = TextEditingController();
 
   @override
   void initState() {
     _class.text = widget.className.toString();
-    mevcut.text = widget.totalStudent.toString();
-    sinifKodu.text = widget.classCode.toString();
+    _totalStudent.text = widget.totalStudent.toString();
+    _classCode.text = widget.classCode.toString();
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
         //Apbar
-        appBar: AppBar(
-          iconTheme: IconThemeData(color: Colors.white),
-          backgroundColor: primaryColor,
-          centerTitle: true,
-          title: CustomText(
-            color: Colors.white,
-            sizes: TextSize.normal,
-            text: "Sınıf Düzenle",
-          ),
+        appBar: CustomAppBar(
+          text: "Sınıf Düzenle",
+          widget: SizedBox(),
         ),
         //Body
         body: SingleChildScrollView(
@@ -74,7 +67,7 @@ class _TeacherEditClassState extends State<TeacherEditClass> {
                 ),
                 CustomTextField(
                   topPadding: size.height * 0.01,
-                  controller: mevcut,
+                  controller: _totalStudent,
                   hintText: "Sınıf Mevcut",
                   suffixIcon: Icon(Icons.people),
                   readonly: false,
@@ -84,7 +77,7 @@ class _TeacherEditClassState extends State<TeacherEditClass> {
                 ),
                 CustomTextField(
                   topPadding: size.height * 0.01,
-                  controller: sinifKodu,
+                  controller: _classCode,
                   hintText: "Sınıf Kodu",
                   suffixIcon: Icon(Icons.code),
                   readonly: false,
@@ -99,15 +92,15 @@ class _TeacherEditClassState extends State<TeacherEditClass> {
                 CustomButton(
                   onpressed: () {
                     if (_class.text.isNotEmpty &&
-                        sinifKodu.text.isNotEmpty &&
-                        mevcut.text.isNotEmpty) {
+                        _classCode.text.isNotEmpty &&
+                        _totalStudent.text.isNotEmpty) {
                       FirebaseFirestore.instance
                           .collection(widget.email)
                           .doc(widget.uid)
                           .update({
-                        "mevcut": mevcut.text,
-                        "sınıf": _class.text,
-                        "sınıfKodu": sinifKodu.text
+                        "totalStudent": _totalStudent.text,
+                        "class": _class.text,
+                        "classCode": _classCode.text
                       });
 
                       CustomDialog().firstDialog(
