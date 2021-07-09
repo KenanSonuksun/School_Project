@@ -2,7 +2,7 @@
 <br><br>
   All teachers and students can do everything very easily because of this project . Teachers and student can see Homeworks,announcements,lesson plans and personal informations easily.
  <br><br>
-  The project was developed in Flutter. The project implemented by layered software corporate architecture and SOLID software principles. And I connect the project to firebase. And I used provider. User can get all datas from firebase easily because of provider. As you can see, The project has been written by clean code rules. And all processes happen fast. You can examine codes.
+  The project was developed in Flutter. The project implemented by layered software corporate architecture and SOLID software principles. And I connect the project to firebase. I used firebase features like upload image, posting ,getting , email and password validation , verifying email. And I used provider. User can get all datas from firebase easily because of provider. As you can see, The project has been written by clean code rules. And all processes happen fast. The project has animations in every pages by the way. Because view of a project is most important thing for users. You can examine codes.
  <br><br>
 
 
