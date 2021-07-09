@@ -4,6 +4,7 @@
  <br><br>
   The project was developed in Flutter. The project implemented by layered software corporate architecture and SOLID software principles. And I connect the project to firebase. I used firebase features like upload image, posting ,getting , email and password validation , verifying email. And I used provider. User can get all datas from firebase easily because of provider. As you can see, The project has been written by clean code rules. And all processes happen fast. The project has animations in every pages by the way. Because view of a project is most important thing for users. You can examine codes.
  <br><br>
+  I removed Firebase informations because of security.
 
 
 Thank you for taking your time to read. You can contact me from my accounts below.<br>
